@@ -373,49 +373,85 @@ class problema_grafica_grafo(blocales.Problema):
 
         imagen.save(filename)
 
+    def main():
+        """
+        La función principal
 
-def main():
-    """
-    La función principal
+        """
 
-    """
+        # Vamos a definir un grafo sencillo
+        vertices_sencillo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        aristas_sencillo = [('B', 'G'),
+                            ('E', 'F'),
+                            ('H', 'E'),
+                            ('D', 'B'),
+                            ('H', 'G'),
+                            ('A', 'E'),
+                            ('C', 'F'),
+                            ('H', 'B'),
+                            ('F', 'A'),
+                            ('C', 'B'),
+                            ('H', 'F')]
+        dimension = 400
 
-    # Vamos a definir un grafo sencillo
-    vertices_sencillo = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    aristas_sencillo = [('B', 'G'),
-                        ('E', 'F'),
-                        ('H', 'E'),
-                        ('D', 'B'),
-                        ('H', 'G'),
-                        ('A', 'E'),
-                        ('C', 'F'),
-                        ('H', 'B'),
-                        ('F', 'A'),
-                        ('C', 'B'),
-                        ('H', 'F')]
-    dimension = 400
+        grafo_sencillo = problema_grafica_grafo(vertices_sencillo,
+                                                aristas_sencillo,
+                                                dimension)
 
-    # Y vamos a hacer un dibujo del grafo sin decirle como hacer para
-    # ajustarlo.
-    grafo_sencillo = problema_grafica_grafo(vertices_sencillo,
-                                            aristas_sencillo,
-                                            dimension)
+        estado_aleatorio = grafo_sencillo.estado_aleatorio()
+        costo_inicial = grafo_sencillo.costo(estado_aleatorio)
+        grafo_sencillo.dibuja_grafo(estado_aleatorio, "prueba_inicial.gif")
+        print("Costo del estado aleatorio: {}".format(costo_inicial))
 
-    estado_aleatorio = grafo_sencillo.estado_aleatorio()
-    costo_inicial = grafo_sencillo.costo(estado_aleatorio)
-    grafo_sencillo.dibuja_grafo(estado_aleatorio, "prueba_inicial.gif")
-    print("Costo del estado aleatorio: {}".format(costo_inicial))
+        t_inicial = time.time()
+        solucion = blocales.temple_simulado(grafo_sencillo)
+        t_final = time.time()
+        costo_final = grafo_sencillo.costo(solucion)
 
-    # Ahora vamos a encontrar donde deben de estar los puntos
-    t_inicial = time.time()
-    solucion = blocales.temple_simulado(grafo_sencillo)
-    t_final = time.time()
-    costo_final = grafo_sencillo.costo(solucion)
+        grafo_sencillo.dibuja_grafo(solucion, "prueba_final.gif")
+        print("\nUtilizando la calendarización por default")
+        print("Costo de la solución encontrada: {}".format(costo_final))
+        print("Tiempo de ejecución en segundos: {}".format(t_final - t_inicial))
 
-    grafo_sencillo.dibuja_grafo(solucion, "prueba_final.gif")
-    print("\nUtilizando la calendarización por default")
-    print("Costo de la solución encontrada: {}".format(costo_final))
-    print("Tiempo de ejecución en segundos: {}".format(t_final - t_inicial))
+        # Calendarización alternativa: geométrica (enfriamiento más lento)
+        costos = [grafo_sencillo.costo(grafo_sencillo.estado_aleatorio())
+                  for _ in range(10 * len(grafo_sencillo.estado_aleatorio()))]
+        T_ini = 2 * (max(costos) - min(costos))
+        factor = 0.999
+        cal_geometrica = (T_ini * (factor ** i) for i in range(int(1e6)))
+
+        t_inicial = time.time()
+        solucion2 = blocales.temple_simulado(grafo_sencillo, cal_geometrica)
+        t_final = time.time()
+        costo_final2 = grafo_sencillo.costo(solucion2)
+
+        grafo_sencillo.dibuja_grafo(solucion2, "prueba_geometrica.gif")
+        print("\nUtilizando calendarización geométrica (factor={})".format(factor))
+        print("Costo de la solución encontrada: {}".format(costo_final2))
+        print("Tiempo de ejecución en segundos: {}".format(t_final - t_inicial))
+
+        # Grafo propio: más complejo para probar mejor el algoritmo
+        vertices_propio = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        aristas_propio = [('A', 'B'), ('A', 'C'), ('A', 'D'),
+                          ('B', 'E'), ('B', 'F'),
+                          ('C', 'G'), ('C', 'H'),
+                          ('D', 'I'), ('D', 'J'),
+                          ('E', 'G'), ('F', 'H'),
+                          ('G', 'I'), ('H', 'J'),
+                          ('I', 'B'), ('J', 'F'),
+                          ('E', 'J')]
+
+        grafo_propio = problema_grafica_grafo(vertices_propio, aristas_propio, dimension)
+
+        t_inicial = time.time()
+        solucion3 = blocales.temple_simulado(grafo_propio)
+        t_final = time.time()
+        costo_final3 = grafo_propio.costo(solucion3)
+
+        grafo_propio.dibuja_grafo(solucion3, "prueba_grafo_propio.gif")
+        print("\nGrafo propio (10 vértices, 16 aristas)")
+        print("Costo de la solución encontrada: {}".format(costo_final3))
+        print("Tiempo de ejecución en segundos: {}".format(t_final - t_inicial))
 
     # ¿Que valores para ajustar el temple simulado son los que mejor
     # resultado dan?
@@ -437,5 +473,3 @@ def main():
     #
 
 
-if __name__ == '__main__':
-    main()
