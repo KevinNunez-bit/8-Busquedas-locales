@@ -19,7 +19,7 @@ $pip install pillow
 
 """
 
-__author__ = 'Escribe aquí tu nombre'
+__author__ = 'Kevin Nunez'
 
 import blocales
 import random
@@ -267,10 +267,42 @@ class problema_grafica_grafo(blocales.Problema):
         @return: Un número.
 
         """
-        # Agrega el método que considere el angulo entre aristas de
-        # cada vertice. Dale diferente peso a cada criterio hasta
- 
-        return 0
+        total = 0
+        for v in self.vertices:
+            x0, y0 = estado_dic[v]
+            # buscar todos los vecinos de v en las aristas
+            vecinos_v = []
+            for (a, b) in self.aristas:
+                if a == v:
+                    vecinos_v.append(b)
+                elif b == v:
+                    vecinos_v.append(a)
+
+            if len(vecinos_v) < 2:
+                continue
+
+            # calcular angulo entre cada par de aristas que comparten v
+            for i in range(len(vecinos_v)):
+                for j in range(i + 1, len(vecinos_v)):
+                    xi, yi = estado_dic[vecinos_v[i]]
+                    xj, yj = estado_dic[vecinos_v[j]]
+
+                    dx1, dy1 = xi - x0, yi - y0
+                    dx2, dy2 = xj - x0, yj - y0
+
+                    mag1 = math.sqrt(dx1 ** 2 + dy1 ** 2)
+                    mag2 = math.sqrt(dx2 ** 2 + dy2 ** 2)
+
+                    if mag1 == 0 or mag2 == 0:
+                        continue
+
+                    cos_ang = (dx1 * dx2 + dy1 * dy2) / (mag1 * mag2)
+                    cos_ang = max(-1.0, min(1.0, cos_ang))
+                    angulo = math.acos(cos_ang)
+
+                    if angulo < math.pi / 6:
+                        total += 1.0 - angulo / (math.pi / 6)
+        return total
 
     def criterio_propio(self, estado_dic):
         """
