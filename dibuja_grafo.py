@@ -93,30 +93,26 @@ class problema_grafica_grafo(blocales.Problema):
                             min(self.dim - 10,
                                 vecino[i] + random.randint(-10, 10)))
             yield tuple(vecino)
-    
-    def vecino_aleatorio(self, estado, dmax=10):
-        """
-        Encuentra un vecino en forma aleatoria. En estea primera
-        versión lo que hacemos es tomar un valor aleatorio, y
-        sumarle o restarle x pixeles al azar.
 
-        Este es un vecino aleatorio muy malo. Por lo que deberás buscar
-        como hacer un mejor vecino aleatorio y comparar las ventajas de
-        hacer un mejor vecino en el algoritmo de temple simulado.
+        def vecino_aleatorio(self, estado, dmax=10):
+            """
+            Encuentra un vecino en forma aleatoria. En lugar de mover solo
+            una coordenada, mueve las dos coordenadas (x, y) de un vertice
+            completo. Esto explora mejor el espacio de soluciones.
 
-        @param estado: Una tupla con el estado.
-        @param dispersion: Un flotante con el valor de dispersión para el
-                           vertice seleccionado
+            @param estado: Una tupla con el estado.
+            @param dmax: Desplazamiento maximo en pixeles.
 
-        @return: Una tupla con un estado vecino al estado de entrada.
+            @return: Una tupla con un estado vecino al estado de entrada.
 
-        """
-        vecino = list(estado)
-        i = random.randint(0, len(vecino) - 1)
-        vecino[i] = max(10,
-                        min(self.dim - 10,
-                            vecino[i] + random.randint(-dmax,  dmax)))
-        return tuple(vecino)
+            """
+            vecino = list(estado)
+            # seleccionar un vertice completo (cada vertice ocupa 2 posiciones)
+            vertice = random.randint(0, len(self.vertices) - 1)
+            i = vertice * 2
+            vecino[i] = max(10, min(self.dim - 10, vecino[i] + random.randint(-dmax, dmax)))
+            vecino[i + 1] = max(10, min(self.dim - 10, vecino[i + 1] + random.randint(-dmax, dmax)))
+            return tuple(vecino)
 
         
         # Por supuesto que esta no es la mejor manera de generar vecinos.
