@@ -141,9 +141,9 @@ class problema_grafica_grafo(blocales.Problema):
         # Inicializa fáctores lineales para los criterios más importantes
         # (default solo cuanta el criterio 1)
         K1 = 1.0
-        K2 = 0.0
-        K3 = 0.0
-        K4 = 0.0
+        K2 = 0.1
+        K3 = 0.5
+        K4 = 0.2
 
         # Genera un diccionario con el estado y la posición
         estado_dic = self.estado2dic(estado)
@@ -309,6 +309,9 @@ class problema_grafica_grafo(blocales.Problema):
         Implementa y comenta correctamente un criterio de costo que sea
         conveniente para que un grafo luzca bien.
 
+        Penaliza vertices que quedan muy cerca del borde de la imagen,
+        para que el grafo se mantenga centrado y visible.
+
         @param estado_dic: Diccionario cuyas llaves son los vértices
                            del grafo y cuyos valores es una tupla con
                            la posición (x, y) de ese vértice en el
@@ -317,11 +320,19 @@ class problema_grafica_grafo(blocales.Problema):
         @return: Un número.
 
         """
-        # Desarrolla un criterio propio y ajusta su importancia en el
-        # costo total con K4 ¿Mejora el resultado? ¿En que mejora el
-        # resultado final?
-
-        return 0
+        total = 0
+        margen = 50
+        for v in self.vertices:
+            x, y = estado_dic[v]
+            if x < margen:
+                total += (margen - x) / margen
+            if x > self.dim - margen:
+                total += (x - (self.dim - margen)) / margen
+            if y < margen:
+                total += (margen - y) / margen
+            if y > self.dim - margen:
+                total += (y - (self.dim - margen)) / margen
+        return total
 
     def estado2dic(self, estado):
         """
