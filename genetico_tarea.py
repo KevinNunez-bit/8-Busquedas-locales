@@ -104,30 +104,34 @@ class GeneticoPermutacionesPropio(genetico.Genetico):
 
     def mutación(self, individuos):
         """
+        Mutación por intercambio. Con probabilidad prob_muta intercambia
+        dos posiciones aleatorias del individuo.
 
-        @param poblacion: Una lista de individuos (listas).
-
+        @param individuos: Una lista de individuos (listas).
         @return: None, es efecto colateral mutando los individuos
                  en la misma lista
 
         """
-        #
-        # ------ IMPLEMENTA AQUI TU CÓDIGO --------------------------------
-        #
-        raise NotImplementedError("¡Este metodo debe ser implementado!")
+        for individuo in individuos:
+            for i in range(len(individuo)):
+                if random.random() < self.prob_muta:
+                    j = random.randint(0, len(individuo) - 1)
+                    individuo[i], individuo[j] = individuo[j], individuo[i]
 
     def reemplazo_generacional(self, individuos):
         """
-        Realiza el reemplazo generacional diferente al elitismo
+        Reemplazo generacional: se mezclan padres e hijos y se conservan
+        los mejores. Diferente al elitismo puro porque los hijos pueden
+        desplazar a cualquier padre, no solo al peor.
 
-        @param individuos: Una lista de cromosomas de hijos que pueden
-                           usarse en el reemplazo
+        @param individuos: Una lista de cromosomas de hijos
         @return: None (todo lo cambia internamente)
 
         """
-        #
-        # ------ IMPLEMENTA AQUI TU CÓDIGO --------------------------------
-        #
+        hijos_evaluados = [(self.adaptación(ind), ind) for ind in individuos]
+        todos = self.población + hijos_evaluados
+        todos.sort(reverse=True)
+        self.población = todos[:self.n_población]
 
 
 if __name__ == "__main__":
