@@ -63,28 +63,44 @@ class GeneticoPermutacionesPropio(genetico.Genetico):
 
     def selección(self):
         """
-        Seleccion de estados mediante método diferente a la ruleta
+        Seleccion por torneo. Se eligen k candidatos al azar y gana
+        el de mayor adaptación. Más eficiente que la ruleta.
 
         @return: Una lista con pares de indices de los individuo que se van
                  a cruzar
 
         """
-        #
-        # ------ IMPLEMENTA AQUI TU CÓDIGO ----------------------------------
-        #
-        raise NotImplementedError("¡Este metodo debe ser implementado!")
+        k = 3
+        parejas = []
+        for _ in range(self.n_población):
+            candidatos_i = random.sample(range(len(self.población)), k)
+            i = max(candidatos_i, key=lambda x: self.población[x][0])
+            candidatos_j = random.sample(range(len(self.población)), k)
+            j = max(candidatos_j, key=lambda x: self.población[x][0])
+            parejas.append((i, j))
+        return parejas
 
     def cruza_individual(self, cadena1, cadena2):
         """
-        @param cadena1: Una tupla con un individuo
-        @param cadena2: Una tupla con otro individuo
-        @return: Un individuo
+        Cruza por orden (OX). Copia un segmento de cadena1 y completa
+        con el orden relativo de cadena2. Mantiene la propiedad de permutación.
+
+        @param cadena1: Una lista con un individuo
+        @param cadena2: Una lista con otro individuo
+        @return: Un individuo nuevo
 
         """
-        #
-        # ------ IMPLEMENTA AQUI TU CÓDIGO ----------------------------------
-        #
-        raise NotImplementedError("¡Este metodo debe ser implementado!")
+        n = len(cadena1)
+        hijo = [None] * n
+        inicio = random.randint(0, n - 1)
+        fin = random.randint(inicio + 1, n)
+        hijo[inicio:fin] = cadena1[inicio:fin]
+        pos = fin % n
+        for gen in cadena2[fin:] + cadena2[:fin]:
+            if gen not in hijo:
+                hijo[pos] = gen
+                pos = (pos + 1) % n
+        return hijo
 
     def mutación(self, individuos):
         """
